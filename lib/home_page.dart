@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  final String userName;
-  final Map<String, dynamic> userData;
+  final String userName; // Menyimpan nama pengguna
 
-  HomePage(this.userName, this.userData); // Add this constructor
+  HomePage(this.userName); // Add this constructor
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,7 @@ class HomePage extends StatelessWidget {
                   Navigator.pushNamed(context, 'Profile');
                 },
                 child: Text(
-                  'Welcome, $userName', // Use the userName here
+                  'Welcome, $userName', // Menampilkan pesan "Welcome, [Nama Pengguna]"
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

@@ -52,6 +52,8 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final token = data['token'];
+        final userName =
+            data['pegawai']['nama']; // Mengambil nama pengguna dari respons
 
         // Save the token to local storage (e.g., SharedPreferences)
 
@@ -59,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
           context,
           MaterialPageRoute(
             builder: (context) =>
-                HomePage('Nama Pengguna', {'data': 'pengguna'}),
+                HomePage(userName), // Mengirim nama pengguna ke HomePage
           ),
         );
       } else {

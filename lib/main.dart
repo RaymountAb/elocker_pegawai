@@ -6,10 +6,10 @@ import 'qrcode_page.dart';
 
 void main() {
   runApp(MaterialApp(
-    initialRoute: '/Login',
+    initialRoute: 'Login',
     routes: {
       'Login': (context) => LoginPage(),
-      'Home': (context) => HomePage('Nama Pengguna', {'data': 'pengguna'}),
+      //'Home': (context) => HomePage(),
       'QRCode': (context) => QRCodePage(),
       'Profile': (context) => ProfilePage(),
     },
