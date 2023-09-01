@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
   final String userName; // Menyimpan nama pengguna
+  final String token;
 
-  HomePage(this.userName); // Add this constructor
+  HomePage(this.userName, this.token); // Add this constructor
 
   @override
   Widget build(BuildContext context) {

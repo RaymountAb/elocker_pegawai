@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
           context,
           MaterialPageRoute(
             builder: (context) =>
-                HomePage(userName), // Mengirim nama pengguna ke HomePage
+                HomePage(userName, token), // Mengirim nama pengguna ke HomePage
           ),
         );
       } else {
@@ -113,82 +113,84 @@ class _LoginPageState extends State<LoginPage> {
         child: Center(
           child: Padding(
             padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    'assets/images/E-lockerLogo.png',
-                    width: 300,
-                    height: 272,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Align(
-                  alignment: AlignmentDirectional(0, 0),
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                      fontFamily: 'Outfit',
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/images/E-lockerLogo.png',
+                      width: 300,
+                      height: 272,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  child: TextField(
-                    controller: _nipController,
-                    decoration: InputDecoration(
-                      labelText: 'NIP',
-                      hintStyle: TextStyle(fontSize: 16),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  Align(
+                    alignment: AlignmentDirectional(0, 0),
+                    child: Text(
+                      'Login',
+                      style: TextStyle(
+                        fontFamily: 'Outfit',
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    style: TextStyle(fontSize: 16),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  child: TextField(
-                    controller: _passwordController,
-                    obscureText: !_passwordVisibility,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      hintStyle: TextStyle(fontSize: 16),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      suffixIcon: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _passwordVisibility = !_passwordVisibility;
-                          });
-                        },
-                        child: Icon(
-                          _passwordVisibility
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                          size: 22,
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    child: TextField(
+                      controller: _nipController,
+                      decoration: InputDecoration(
+                        labelText: 'NIP',
+                        hintStyle: TextStyle(fontSize: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    ),
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () => _login(context),
-                  child: Text('Submit'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 55),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      style: TextStyle(fontSize: 16),
                     ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    child: TextField(
+                      controller: _passwordController,
+                      obscureText: !_passwordVisibility,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        hintStyle: TextStyle(fontSize: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        suffixIcon: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _passwordVisibility = !_passwordVisibility;
+                            });
+                          },
+                          child: Icon(
+                            _passwordVisibility
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                            size: 22,
+                          ),
+                        ),
+                      ),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _login(context),
+                    child: Text('Submit'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 55),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
