@@ -53,15 +53,14 @@ class _LoginPageState extends State<LoginPage> {
         final data = json.decode(response.body);
         final token = data['token'];
         final userName =
-            data['pegawai']['nama']; // Mengambil nama pengguna dari respons
-
-        // Save the token to local storage (e.g., SharedPreferences)
+            data['pegawai']['nama']; // Mengambil nama pengguna dari response
+        final userId = data['pegawai']['id'];
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                HomePage(userName, token), // Mengirim nama pengguna ke HomePage
+            builder: (context) => HomePage(
+                userName, token, userId), // Mengirim nama pengguna ke HomePage
           ),
         );
       } else {
