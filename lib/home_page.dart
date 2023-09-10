@@ -235,7 +235,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   ListView.builder(
-                    shrinkWrap: true, // Untuk menghindari kesalahan tata letak
+                    shrinkWrap: true,
                     itemCount: userData['histories'].length,
                     itemBuilder: (context, index) {
                       final history = userData['histories'][index];
