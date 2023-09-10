@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatelessWidget {
-  final String userName;
   final String token;
-  final String userId;
+  final String userName;
+  final int userId;
 
-  HomePage(this.userName, this.token, this.userId);
+  HomePage(this.token, this.userName, this.userId);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,16 +19,11 @@ class HomePage extends StatelessWidget {
             AppBar(
               backgroundColor: Colors.blue,
               automaticallyImplyLeading: false,
-              title: GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, 'Profile');
-                },
-                child: Text(
-                  'Welcome, $userName',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+              title: Text(
+                'Welcome, ${userName}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               actions: [
@@ -37,9 +34,48 @@ class HomePage extends StatelessWidget {
                     size: 30,
                   ),
                   onPressed: () async {
-                    Navigator.pushNamed(context, 'Login');
+                    // Tampilkan konfirmasi kepada pengguna
+                    bool confirmLogout = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Konfirmasi Logout'),
+                          content: Text('Anda yakin ingin keluar?'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('Batal'),
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pop(false); // Batalkan logout
+                              },
+                            ),
+                            TextButton(
+                              child: Text('Ya, Keluar'),
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pop(true); // Setujui logout
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    // Jika pengguna menyetujui logout, kirim permintaan hapus ke backend API
+                    if (confirmLogout == true) {
+                      // Lakukan permintaan HTTP DELETE ke API Anda untuk logout
+                      // Contoh:
+                      // final response = await http.delete('URL_API_ANDA/logout');
+
+                      // Setelah berhasil logout dari API, hapus token dari penyimpanan lokal
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.remove('token');
+
+                      // Navigasi pengguna kembali ke halaman login
+                      Navigator.pushNamed(context, 'Login');
+                    }
                   },
-                ),
+                )
               ],
               centerTitle: false,
               elevation: 0,

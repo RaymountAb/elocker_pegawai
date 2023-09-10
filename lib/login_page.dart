@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'home_page.dart'; // Import the HomePage page
+import 'package:shared_preferences/shared_preferences.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -18,31 +18,14 @@ class _LoginPageState extends State<LoginPage> {
     String nip = _nipController.text;
     String password = _passwordController.text;
 
-    // Validation: Check if NIP and password are not empty
     if (nip.isEmpty || password.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Login Failed'),
-            content: Text('Please enter NIP and password.'),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      _showAlertDialog('Login Gagal', 'Silakan masukkan NIP dan kata sandi.');
       return;
     }
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.78.11.90/admin-elocker/public/api/v1/login'),
+        Uri.parse('http://10.78.5.169/admin-elocker/public/api/v1/login'),
         body: {
           'nip': nip,
           'password': password,
@@ -51,57 +34,52 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final token = data['token'];
-        final userName =
-            data['pegawai']['nama']; // Mengambil nama pengguna dari response
-        final userId = data['pegawai']['id'];
+        String token = data['token'];
+        final String userName = data['pegawai']['nama'];
+        final int userId = data['pegawai']['id'];
+
+        await _saveTokenToSharedPreferences(token);
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(
-                userName, token, userId), // Mengirim nama pengguna ke HomePage
+            builder: (context) =>
+                HomePage(token, data['pegawai']['nama'], data['pegawai']['id']),
           ),
         );
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Login Failed'),
-              content: Text('Incorrect NIP or password.'),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        _showAlertDialog('Login Gagal', 'NIP atau kata sandi salah.');
       }
     } catch (e) {
       print('Error: $e');
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Login Failed'),
-            content: Text('An error occurred while processing your request.'),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      _showAlertDialog(
+          'Login Gagal', 'Terjadi kesalahan saat memproses permintaan Anda.');
     }
+  }
+
+  Future<void> _saveTokenToSharedPreferences(String token) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+  }
+
+  void _showAlertDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
