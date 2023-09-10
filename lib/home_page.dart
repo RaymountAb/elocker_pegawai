@@ -13,6 +13,19 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+String getActivityDescription(int activityCode) {
+  switch (activityCode) {
+    case 1:
+      return 'Tambah Akses';
+    case 2:
+      return 'Titip Barang';
+    case 3:
+      return 'Akhiri Akses';
+    default:
+      return 'Aktivitas Tidak Dikenal';
+  }
+}
+
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> userData = {};
 
@@ -205,25 +218,35 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 70,
-                    color: Colors.blueGrey, // Ganti dengan warna yang sesuai
-                    padding: EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Loker 1',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                  userData['locker'] != null
+                      ? Container(
+                          width: double.infinity,
+                          height: 70,
+                          color: Colors.blueGrey,
+                          padding: EdgeInsets.all(16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '${userData['locker']['name_loker']}',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                        )
+                      : ElevatedButton(
+                          onPressed: () {
+                            // Tambah akses logic di sini
+                          },
+                          child: Text('Tambah Akses'),
                         ),
-                      ],
-                    ),
-                  ),
                   Padding(
                     padding: EdgeInsets.all(16),
                     child: Text(
@@ -239,40 +262,49 @@ class _HomePageState extends State<HomePage> {
                     itemCount: userData['histories'].length,
                     itemBuilder: (context, index) {
                       final history = userData['histories'][index];
+                      final activityDescription = getActivityDescription(
+                          history['activity']); // Menambah baris ini
 
-                      return Container(
-                        width: double.infinity,
-                        height: 130,
-                        color: Colors.blueGrey,
-                        padding: EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 4),
-                            Text(
-                              'Loker ${history['loker']}',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
+                      return Center(
+                        child: Container(
+                          width: double.infinity,
+                          height: 130,
+                          color: Colors.blueGrey,
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                activityDescription, // Menggunakan deskripsi aktivitas
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Tanggal: ${history['date']}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
+                              Text(
+                                'Loker ${history['loker']}',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Jam: ${history['time']}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
+                              Text(
+                                'Tanggal: ${history['date']}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                          ],
+                              Text(
+                                'Jam: ${history['time']}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
