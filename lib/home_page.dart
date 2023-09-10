@@ -52,7 +52,6 @@ class _HomePageState extends State<HomePage> {
           userData =
               data; // Mengisi userData dengan data yang diterima dari API
         });
-        print('Data yang diterima: $data');
       } else {
         // Tangani kesalahan jika diperlukan
         print('Error: ${response.statusCode}');
