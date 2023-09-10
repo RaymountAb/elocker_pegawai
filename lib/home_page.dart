@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatelessWidget {
   final String token;
@@ -60,19 +61,23 @@ class HomePage extends StatelessWidget {
                         );
                       },
                     );
-
-                    // Jika pengguna menyetujui logout, kirim permintaan hapus ke backend API
                     if (confirmLogout == true) {
-                      // Lakukan permintaan HTTP DELETE ke API Anda untuk logout
-                      // Contoh:
-                      // final response = await http.delete('URL_API_ANDA/logout');
-
-                      // Setelah berhasil logout dari API, hapus token dari penyimpanan lokal
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.remove('token');
-
-                      // Navigasi pengguna kembali ke halaman login
-                      Navigator.pushNamed(context, 'Login');
+                      try {
+                        final response = await http.delete(
+                            'http://10.78.5.169/admin-elocker/public/api/v1/logout'
+                                as Uri);
+                        if (response.statusCode == 200) {
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.remove('token');
+                          Navigator.pushNamed(context, 'Login');
+                        } else {
+                          // Tangani kesalahan logout jika diperlukan
+                          print('Logout Gagal: ${response.statusCode}');
+                        }
+                      } catch (e) {
+                        // Tangani kesalahan lain yang mungkin terjadi
+                        print('Error: $e');
+                      }
                     }
                   },
                 )
