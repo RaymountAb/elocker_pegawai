@@ -35,8 +35,6 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         String token = data['token'];
-        final String userName = data['pegawai']['nama'];
-        final int userId = data['pegawai']['id'];
 
         await _saveTokenToSharedPreferences(token);
 
