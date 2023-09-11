@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+//import 'dart:convert';
 
 class QRCodePage extends StatelessWidget {
+  final Map<String, dynamic> data;
+
+  QRCodePage(this.data);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

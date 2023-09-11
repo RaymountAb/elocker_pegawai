@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'qrcode_page.dart';
 
 class HomePage extends StatefulWidget {
   final String token;
@@ -159,8 +160,32 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, 'QRCode');
+                        onTap: () async {
+                          final userId = widget.userId;
+                          final url = Uri.parse(
+                              'http://10.78.5.169/admin-elocker/public/api/pegawai/qrcode/$userId');
+
+                          final headers = {
+                            'Authorization':
+                                'Bearer ${widget.token}', // Gantilah $yourToken dengan token yang valid
+                          };
+
+                          final response =
+                              await http.get(url, headers: headers);
+
+                          if (response.statusCode == 200) {
+                            final data = json.decode(response.body);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => QRCodePage(data),
+                              ),
+                            );
+                          } else {
+                            // Tangani kesalahan jika permintaan ke server gagal
+                            print(
+                                'Gagal mengambil data QR Code: ${response.statusCode}');
+                          }
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -187,17 +212,40 @@ class _HomePageState extends State<HomePage> {
                       ),
                       SizedBox(height: 12),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, 'QRCode');
+                        onTap: () async {
+                          final userId = widget.userId;
+                          final url = Uri.parse(
+                              'http://10.78.5.169/admin-elocker/public/api/pegawai/qrcode/$userId');
+
+                          final headers = {
+                            'Authorization':
+                                'Bearer ${widget.token}', // Gantilah $yourToken dengan token yang valid
+                          };
+
+                          final response =
+                              await http.get(url, headers: headers);
+
+                          if (response.statusCode == 200) {
+                            final data = json.decode(response.body);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => QRCodePage(data),
+                              ),
+                            );
+                          } else {
+                            // Tangani kesalahan jika permintaan ke server gagal
+                            print(
+                                'Gagal mengambil data QR Code: ${response.statusCode}');
+                          }
                         },
                         child: Text(
                           'Scan QR Code',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue, // Ganti warna teks
-                            decoration:
-                                TextDecoration.underline, // Tambah garis bawah
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ),
