@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'profile_page.dart';
 import 'qrcode_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -75,11 +76,36 @@ class _HomePageState extends State<HomePage> {
               AppBar(
                 backgroundColor: Colors.blue,
                 automaticallyImplyLeading: false,
-                title: Text(
-                  'Welcome, ${userData['userName'] ?? widget.userName}',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                title: GestureDetector(
+                  onTap: () async {
+                    final userId = widget.userId;
+                    final url = Uri.parse(
+                        'http://10.78.5.169/admin-elocker/public/api/pegawai/profile/$userId');
+                    final headers = {
+                      'Authorization':
+                          'Bearer ${widget.token}', // Gantilah $yourToken dengan token yang valid
+                    };
+                    final response = await http.get(url, headers: headers);
+                    if (response.statusCode == 200) {
+                      final data = json.decode(response.body);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePage(data),
+                        ),
+                      );
+                    } else {
+                      // Tangani kesalahan jika permintaan ke server gagal
+                      print(
+                          'Gagal mengambil data QR Code: ${response.statusCode}');
+                    }
+                  },
+                  child: Text(
+                    'Welcome, ${userData['userName'] ?? widget.userName}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 actions: [

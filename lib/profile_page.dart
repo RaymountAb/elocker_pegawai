@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
+  final Map<String, dynamic> data;
+  ProfilePage(this.data);
   @override
   Widget build(BuildContext context) {
+    final pegawaiData = data['pegawai'];
+    final pegawaiDetail = data['pegawaidetail'];
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
@@ -28,7 +32,7 @@ class ProfilePage extends StatelessWidget {
           children: [
             SizedBox(height: 20),
             Text(
-              'Nama Pengguna',
+              pegawaiData['nama'],
               style: TextStyle(
                 fontFamily: 'Outfit',
                 fontSize: 24,
@@ -37,7 +41,7 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             Text(
-              'NIP',
+              pegawaiData['nip'],
               style: TextStyle(
                 fontFamily: 'Readex Pro',
                 fontSize: 20,
@@ -59,17 +63,17 @@ class ProfilePage extends StatelessWidget {
                     ProfileDetailItem(
                       icon: Icons.people_outline_sharp,
                       label: 'Jenis Kelamin',
-                      value: 'Laki-laki',
+                      value: pegawaiDetail['jenis_kelamin'],
                     ),
                     ProfileDetailItem(
                       icon: Icons.contact_phone_outlined,
                       label: 'Nomor Handphone',
-                      value: '085750114081',
+                      value: pegawaiDetail['no_hp'],
                     ),
                     ProfileDetailItem(
                       icon: Icons.place,
                       label: 'Alamat',
-                      value: 'Jalan Raya Sumatra Barat',
+                      value: pegawaiDetail['alamat'],
                     ),
                     SizedBox(height: 20),
                     Align(

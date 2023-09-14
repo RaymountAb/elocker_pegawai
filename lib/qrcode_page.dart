@@ -9,7 +9,7 @@ class QRCodePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String qrCodeData = jsonEncode(data['qrcode']);
+    String qrCodeData = jsonEncode(data['qrcode']['qrcode']);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
