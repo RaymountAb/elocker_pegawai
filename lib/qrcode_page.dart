@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class QRCodePage extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -41,7 +42,7 @@ class QRCodePage extends StatelessWidget {
                 child: QrImageView(
                   data: qrCodeData,
                   version: QrVersions.auto,
-                  size: 200,
+                  size: 400,
                   gapless: true,
                 ),
               ),
@@ -49,8 +50,32 @@ class QRCodePage extends StatelessWidget {
               Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
-                  onPressed: () {
-                    print('Button ditekan ...');
+                  onPressed: () async {
+                    try {
+                      final userId = data['qrcode']['pegawai'];
+                      final response = await http.get(
+                        Uri.parse(
+                            'http://10.78.5.169/admin-elocker/public/api/end-session/$userId'),
+                      );
+
+                      if (response.statusCode == 200) {
+                        // Berhasil menghapus akses, menampilkan respons JSON jika ada.
+                        final jsonResponse = json.decode(response.body);
+                        _showResponseDialog(
+                            context, 'Berhasil Menghapus Akses', jsonResponse);
+                      } else {
+                        // Gagal menghapus akses, menampilkan pesan respons JSON jika ada.
+                        final jsonResponse = json.decode(response.body);
+                        _showResponseDialog(
+                            context, 'Gagal Menghapus Akses', jsonResponse);
+                      }
+                    } catch (e) {
+                      // Terjadi kesalahan saat melakukan permintaan HTTP.
+                      print('Error: $e');
+                      _showResponseDialog(context, 'Error', {
+                        'message': 'Terjadi kesalahan saat menghapus akses.'
+                      });
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFFF000E),
@@ -84,6 +109,28 @@ class QRCodePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showResponseDialog(
+      BuildContext context, String title, Map<String, dynamic> jsonResponse) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(
+              jsonResponse['message']), // Menggunakan pesan dari JSON response
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

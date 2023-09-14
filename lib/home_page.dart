@@ -28,6 +28,28 @@ String getActivityDescription(int activityCode) {
   }
 }
 
+void _showResponseDialog(
+    BuildContext context, String title, Map<String, dynamic> jsonResponse) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(
+            jsonResponse['message']), // Menggunakan pesan dari JSON response
+        actions: <Widget>[
+          TextButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> userData = {};
 
@@ -244,8 +266,7 @@ class _HomePageState extends State<HomePage> {
                               'http://10.78.5.169/admin-elocker/public/api/pegawai/qrcode/$userId');
 
                           final headers = {
-                            'Authorization':
-                                'Bearer ${widget.token}', // Gantilah $yourToken dengan token yang valid
+                            'Authorization': 'Bearer ${widget.token}',
                           };
 
                           final response =
@@ -260,7 +281,6 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           } else {
-                            // Tangani kesalahan jika permintaan ke server gagal
                             print(
                                 'Gagal mengambil data QR Code: ${response.statusCode}');
                           }
@@ -315,8 +335,33 @@ class _HomePageState extends State<HomePage> {
                           ),
                         )
                       : ElevatedButton(
-                          onPressed: () {
-                            // Tambah akses logic di sini
+                          onPressed: () async {
+                            try {
+                              final userId = widget.userId;
+                              final response = await http.get(
+                                Uri.parse(
+                                    'http://10.78.5.169/admin-elocker/public/api/addAkses/$userId'),
+                              );
+
+                              if (response.statusCode == 200) {
+                                // Berhasil menghapus akses, menampilkan respons JSON jika ada.
+                                final jsonResponse = json.decode(response.body);
+                                _showResponseDialog(context,
+                                    'Berhasil Menambah Akses', jsonResponse);
+                              } else {
+                                // Gagal menghapus akses, menampilkan pesan respons JSON jika ada.
+                                final jsonResponse = json.decode(response.body);
+                                _showResponseDialog(context,
+                                    'Gagal Menambah Akses', jsonResponse);
+                              }
+                            } catch (e) {
+                              // Terjadi kesalahan saat melakukan permintaan HTTP.
+                              print('Error: $e');
+                              _showResponseDialog(context, 'Error', {
+                                'message':
+                                    'Terjadi kesalahan saat menambah akses.'
+                              });
+                            }
                           },
                           child: Text('Tambah Akses'),
                         ),
