@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'dart:convert';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'dart:convert';
 
 class QRCodePage extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -8,6 +9,7 @@ class QRCodePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String qrCodeData = jsonEncode(data['qrcode']);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -34,16 +36,13 @@ class QRCodePage extends StatelessWidget {
                   ],
                 ),
               ),
-              Align(
+              Container(
                 alignment: Alignment.center,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                  child: Image.asset(
-                    'assets/images/qr-code_(1).png',
-                    width: 200, // Adjust the width as needed
-                    height: 200, // Adjust the height as needed
-                    fit: BoxFit.contain,
-                  ),
+                child: QrImageView(
+                  data: qrCodeData,
+                  version: QrVersions.auto,
+                  size: 200,
+                  gapless: true,
                 ),
               ),
               SizedBox(height: 20),
@@ -51,10 +50,10 @@ class QRCodePage extends StatelessWidget {
                 alignment: Alignment.center,
                 child: ElevatedButton(
                   onPressed: () {
-                    print('Button pressed ...');
+                    print('Button ditekan ...');
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xFFFF000E),
+                    backgroundColor: Color(0xFFFF000E),
                     padding: EdgeInsets.all(0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -65,11 +64,11 @@ class QRCodePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Container(
-                      width: 200, // Adjust the width as needed
+                      width: 200, // Sesuaikan lebar sesuai kebutuhan
                       height: 55,
                       alignment: Alignment.center,
                       child: Text(
-                        'Delete Access',
+                        'Hapus Akses',
                         style: TextStyle(
                           fontFamily: 'Readex Pro',
                           fontSize: 18,
