@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
-  final Map<String, dynamic> data;
-  ProfilePage(this.data);
+  final Map<String, dynamic> userData; // Data pengguna
+
+  ProfilePage(this.userData);
+
   @override
   Widget build(BuildContext context) {
-    final pegawaiData = data['pegawai'];
-    final pegawaiDetail = data['pegawaidetail'];
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
@@ -18,7 +18,7 @@ class ProfilePage extends StatelessWidget {
             color: Colors.white,
             size: 30,
           ),
-          onPressed: () async {
+          onPressed: () {
             Navigator.of(context).pop();
           },
         ),
@@ -32,7 +32,7 @@ class ProfilePage extends StatelessWidget {
           children: [
             SizedBox(height: 20),
             Text(
-              pegawaiData['nama'],
+              '${userData['pegawai'][0]['nama']}',
               style: TextStyle(
                 fontFamily: 'Outfit',
                 fontSize: 24,
@@ -41,7 +41,7 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             Text(
-              pegawaiData['nip'],
+              '${userData['pegawai'][0]['nip']}',
               style: TextStyle(
                 fontFamily: 'Readex Pro',
                 fontSize: 20,
@@ -63,17 +63,17 @@ class ProfilePage extends StatelessWidget {
                     ProfileDetailItem(
                       icon: Icons.people_outline_sharp,
                       label: 'Jenis Kelamin',
-                      value: pegawaiDetail['jenis_kelamin'],
+                      value: '${userData['pegawaidetail'][0]['jenis_kelamin']}',
                     ),
                     ProfileDetailItem(
                       icon: Icons.contact_phone_outlined,
                       label: 'Nomor Handphone',
-                      value: pegawaiDetail['no_hp'],
+                      value: '${userData['pegawaidetail'][0]['no_hp']}',
                     ),
                     ProfileDetailItem(
                       icon: Icons.place,
                       label: 'Alamat',
-                      value: pegawaiDetail['alamat'],
+                      value: '${userData['pegawaidetail'][0]['alamat']}',
                     ),
                     SizedBox(height: 20),
                     Align(
@@ -106,6 +106,17 @@ class ProfileDetailItem extends StatelessWidget {
     required this.value,
   });
 
+  // Buat metode untuk mengonversi nilai jenis kelamin
+  String convertJenisKelamin(String value) {
+    if (value == "1") {
+      return "Laki-laki";
+    } else if (value == "0") {
+      return "Perempuan";
+    } else {
+      return "Tidak Diketahui";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -130,7 +141,8 @@ class ProfileDetailItem extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  value,
+                  // Gunakan metode convertJenisKelamin untuk mengonversi nilai
+                  convertJenisKelamin(value),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey,

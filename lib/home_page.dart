@@ -114,26 +114,26 @@ class _HomePageState extends State<HomePage> {
         onTap: () async {
           final userId = widget.userId;
           final url = Uri.parse(
-              'http://10.78.12.112/admin-elocker/public/api/pegawai/profile/$userId'); // Ganti URL_PROFILE_API dengan URL yang sesuai
+              'http://10.78.12.112/admin-elocker/public/api/pegawai/profile/$userId');
+
           final headers = {
-            'Authorization': 'Bearer ${widget.token}',
+            'Authorization':
+                'Bearer ${widget.token}', // Gantilah $yourToken dengan token yang valid
           };
 
-          try {
-            final response = await http.get(url, headers: headers);
-            if (response.statusCode == 200) {
-              final data = json.decode(response.body);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProfilePage(data),
-                ),
-              );
-            } else {
-              print('Gagal mengambil data profil: ${response.statusCode}');
-            }
-          } catch (e) {
-            print('Error: $e');
+          final response = await http.get(url, headers: headers);
+
+          if (response.statusCode == 200) {
+            final data = json.decode(response.body);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfilePage(data),
+              ),
+            );
+          } else {
+            // Tangani kesalahan jika permintaan ke server gagal
+            print('Gagal mengambil data QR Code: ${response.statusCode}');
           }
         },
         child: Text(

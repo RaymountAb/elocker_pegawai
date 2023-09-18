@@ -53,7 +53,6 @@ class _QRCodePageState extends State<QRCodePage> {
 
   Widget buildQRCode() {
     String qrcodeValue = widget.qrCodeData['qrcode'][0]['qrcode'];
-    print(qrcodeValue);
     return Container(
       alignment: Alignment.center,
       child: QrImageView(
