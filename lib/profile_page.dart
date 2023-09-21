@@ -107,13 +107,17 @@ class ProfileDetailItem extends StatelessWidget {
   });
 
   // Buat metode untuk mengonversi nilai jenis kelamin
-  String convertJenisKelamin(String value) {
-    if (value == "1") {
-      return "Laki-laki";
-    } else if (value == "0") {
-      return "Perempuan";
+  String convertValue(String label, String value) {
+    if (label == 'Jenis Kelamin') {
+      if (value == "1") {
+        return "Laki-laki";
+      } else if (value == "0") {
+        return "Perempuan";
+      } else {
+        return "Tidak Diketahui";
+      }
     } else {
-      return "Tidak Diketahui";
+      return value;
     }
   }
 
@@ -141,8 +145,8 @@ class ProfileDetailItem extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  // Gunakan metode convertJenisKelamin untuk mengonversi nilai
-                  convertJenisKelamin(value),
+                  // Gunakan metode convertValue untuk mengonversi nilai
+                  convertValue(label, value),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey,

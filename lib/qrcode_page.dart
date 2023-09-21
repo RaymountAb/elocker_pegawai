@@ -55,45 +55,40 @@ class _QRCodePageState extends State<QRCodePage> {
     String qrcodeValue = widget.qrCodeData['qrcode'][0]['qrcode'];
     return Container(
       alignment: Alignment.center,
-      child: QrImageView(
-        data: qrcodeValue,
-        version: QrVersions.auto,
-        size: 350,
-        gapless: true,
+      child: Column(
+        children: [
+          QrImageView(
+            data: qrcodeValue,
+            version: QrVersions.auto,
+            size: 350,
+            gapless: true,
+          ),
+          SizedBox(height: 20), // Add some spacing below the QR code
+        ],
       ),
     );
   }
 
   Widget buildDeleteAccessButton(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
+    return Center(
       child: ElevatedButton(
         onPressed: () {
           deleteAccess(context);
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFFFF000E),
-          padding: EdgeInsets.all(0),
+          primary: Color(0xFFFF000E), // Warna latar belakang
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+          padding: EdgeInsets.symmetric(
+              vertical: 15, horizontal: 40), // Sesuaikan ukuran tombol
         ),
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Container(
-            width: 200,
-            height: 55,
-            alignment: Alignment.center,
-            child: Text(
-              'Hapus Akses',
-              style: TextStyle(
-                fontFamily: 'Readex Pro',
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
+        child: Text(
+          'Hapus Akses',
+          style: TextStyle(
+            fontFamily: 'Readex Pro',
+            fontSize: 18,
+            color: Colors.white,
           ),
         ),
       ),
@@ -102,47 +97,45 @@ class _QRCodePageState extends State<QRCodePage> {
 
   Future<void> deleteAccess(BuildContext context) async {
     try {
-      final int userId = widget.qrCodeData['qrcode'][0]['pegawai'];
+      final id = widget.qrCodeData['qrcode'][0]['pegawai'];
       final response = await http.get(
         Uri.parse(
-            'http://10.78.12.112/admin-elocker/public/api/end-session/$userId'), // Ganti URL_DELETE_ACCESS_API dengan URL yang sesuai
+            'http://10.78.2.251/admin-elocker/public/api/end-session/$id'),
       );
 
+      final jsonResponse = json.decode(response.body);
+      String status = jsonResponse['status'];
+      String message = jsonResponse['message'];
+
       if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
-        showResponseDialog(context, 'Berhasil Menghapus Akses', jsonResponse);
+        if (status == 'success') {
+          showSnackBar(context, 'Berhasil Menghapus Akses: $message');
+        } else {
+          showSnackBar(context, 'Gagal Menghapus Akses: $message');
+        }
       } else {
-        final jsonResponse = json.decode(response.body);
-        showResponseDialog(context, 'Gagal Menghapus Akses', jsonResponse);
+        showSnackBar(
+          context,
+          'Gagal Menghapus Akses',
+        );
       }
     } catch (e) {
       print('Error: $e');
-      showResponseDialog(context, 'Error',
-          {'message': 'Terjadi kesalahan saat menghapus akses.'});
+      showSnackBar(
+        context,
+        'Gagal Menghapus Akses',
+      );
     }
   }
 
-  void showResponseDialog(
-      BuildContext context, String title, Map<String, dynamic> jsonResponse) {
-    final message = jsonResponse['message'];
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content:
-              Text(message != null ? message.toString() : 'Tidak ada pesan'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+  void showSnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(message.isNotEmpty ? message : 'Tidak ada pesan'),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: () {},
+      ),
     );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

@@ -63,25 +63,22 @@ class _HomePageState extends State<HomePage> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://10.78.12.112/admin-elocker/public/api/pegawai/home/$userId'),
+          'http://10.78.2.251/admin-elocker/public/api/pegawai/home/$userId',
+        ),
         headers: {
-          'Authorization':
-              'Bearer ${widget.token}', // Menggunakan token dari properti widget
+          'Authorization': 'Bearer ${widget.token}',
         },
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          userData =
-              data; // Mengisi userData dengan data yang diterima dari API
+          userData = data;
         });
       } else {
-        // Tangani kesalahan jika diperlukan
         print('Error: ${response.statusCode}');
       }
     } catch (e) {
-      // Tangani kesalahan lain yang mungkin terjadi
       print('Error: $e');
     }
   }
@@ -91,14 +88,19 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              buildAppBar(),
-              buildQRCodeSection(),
-              buildUserHistorySection(),
-            ],
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await fetchData(widget.userId);
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                buildAppBar(),
+                buildQRCodeSection(),
+                buildUserHistorySection(),
+              ],
+            ),
           ),
         ),
       ),
@@ -114,7 +116,7 @@ class _HomePageState extends State<HomePage> {
         onTap: () async {
           final userId = widget.userId;
           final url = Uri.parse(
-              'http://10.78.12.112/admin-elocker/public/api/pegawai/profile/$userId');
+              'http://10.78.2.251/admin-elocker/public/api/pegawai/profile/$userId');
 
           final headers = {
             'Authorization':
@@ -177,19 +179,22 @@ class _HomePageState extends State<HomePage> {
             );
             if (confirmLogout == true) {
               try {
-                final response = await http.delete(
+                final response = await http.post(
                   Uri.parse(
-                      'http://10.78.12.112/admin-elocker/public/api/v1/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
+                      'http://10.78.2.251/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
                   headers: {
                     'Authorization': 'Bearer ${widget.token}',
                   },
                 );
                 if (response.statusCode == 200) {
+                  // Logout berhasil, arahkan ke halaman login
                   Navigator.pushNamed(context, 'Login');
                 } else {
+                  // Logout gagal, cetak kode status
                   print('Logout Gagal: ${response.statusCode}');
                 }
               } catch (e) {
+                // Tangani kesalahan jaringan
                 print('Error: $e');
               }
             }
@@ -219,7 +224,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () async {
                 final userId = widget.userId;
                 final url = Uri.parse(
-                    'http://10.78.12.112/admin-elocker/public/api/pegawai/qrcode/$userId');
+                    'http://10.78.2.251/admin-elocker/public/api/pegawai/qrcode/$userId');
 
                 final headers = {
                   'Authorization':
@@ -269,7 +274,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () async {
                 final userId = widget.userId;
                 final url = Uri.parse(
-                    'http://10.78.12.112/admin-elocker/public/api/pegawai/qrcode/$userId');
+                    'http://10.78.2.251/admin-elocker/public/api/pegawai/qrcode/$userId');
 
                 final headers = {
                   'Authorization':
@@ -310,6 +315,7 @@ class _HomePageState extends State<HomePage> {
   // Widget untuk bagian User History
   Widget buildUserHistorySection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: EdgeInsets.all(16),
@@ -321,58 +327,59 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        userData['locker'] != null
-            ? Container(
-                width: double.infinity,
-                height: 70,
-                color: Colors.blueGrey,
-                padding: EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        '${userData['locker']['name_loker']}',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+        Center(
+          // Tambahkan Center widget di sini
+          child: userData['locker'] != null
+              ? Container(
+                  width: double.infinity,
+                  height: 70,
+                  color: Colors.blueGrey,
+                  padding: EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${userData['locker']['name_loker']}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : ElevatedButton(
-                onPressed: () async {
-                  try {
-                    final userId = widget.userId;
-                    final response = await http.get(
-                      Uri.parse(
-                          'http://10.78.12.112/admin-elocker/public/api/addAkses/$userId'),
-                    );
+                    ],
+                  ),
+                )
+              : ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      final userId = widget.userId;
+                      final response = await http.get(
+                        Uri.parse(
+                            'http://10.78.2.251/admin-elocker/public/api/addAkses/$userId'),
+                      );
 
-                    if (response.statusCode == 200) {
-                      // Berhasil menghapus akses, menampilkan respons JSON jika ada.
-                      final jsonResponse = json.decode(response.body);
-                      _showResponseDialog(
-                          context, 'Berhasil Menambah Akses', jsonResponse);
-                    } else {
-                      // Gagal menghapus akses, menampilkan pesan respons JSON jika ada.
-                      final jsonResponse = json.decode(response.body);
-                      _showResponseDialog(
-                          context, 'Gagal Menambah Akses', jsonResponse);
+                      if (response.statusCode == 200) {
+                        final jsonResponse = json.decode(response.body);
+                        _showResponseDialog(
+                            context, 'Berhasil Menambah Akses', jsonResponse);
+                      } else {
+                        final jsonResponse = json.decode(response.body);
+                        _showResponseDialog(
+                            context, 'Gagal Menambah Akses', jsonResponse);
+                      }
+                    } catch (e) {
+                      print('Error: $e');
+                      _showResponseDialog(context, 'Error', {
+                        'message': 'Terjadi kesalahan saat menambah akses.'
+                      });
                     }
-                  } catch (e) {
-                    // Terjadi kesalahan saat melakukan permintaan HTTP.
-                    print('Error: $e');
-                    _showResponseDialog(context, 'Error',
-                        {'message': 'Terjadi kesalahan saat menambah akses.'});
-                  }
-                },
-                child: Text('Tambah Akses'),
-              ),
+                  },
+                  child: Text('Tambah Akses'),
+                ),
+        ),
         Padding(
           padding: EdgeInsets.all(16),
           child: Text(
@@ -383,60 +390,65 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount:
-              userData['histories'] != null ? userData['histories'].length : 0,
-          itemBuilder: (context, index) {
-            final history = userData['histories'][index];
-            final activityDescription = getActivityDescription(
-                history['activity']); // Menambah baris ini
-
-            return Center(
-              child: Container(
-                width: double.infinity,
-                height: 130,
-                color: Colors.blueGrey,
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      activityDescription, // Menggunakan deskripsi aktivitas
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      'Loker ${history['loker']}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      'Tanggal: ${history['date']}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      'Jam: ${history['time']}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+        if (userData['histories'] != null)
+          Column(
+            children: userData['histories']
+                .map<Widget>((history) => buildHistoryItem(history))
+                .toList(),
+          ),
       ],
+    );
+  }
+
+  Widget buildHistoryItem(Map<String, dynamic> history) {
+    final activityDescription = getActivityDescription(history['activity']);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.blueGrey,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.center, // Mengubah alignment ke tengah
+          children: [
+            Text(
+              activityDescription,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Loker ${history['loker']}',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              'Tanggal: ${history['date']}',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              'Jam: ${history['time']}',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

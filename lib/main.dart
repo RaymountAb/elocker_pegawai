@@ -7,11 +7,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'E-Locker Pegawai', // Ganti dengan nama aplikasi Anda
+      title: 'E-Locker Pegawai',
       theme: ThemeData(
-        primarySwatch: Colors.blue, // Ganti dengan warna tema Anda
+        primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),
+      initialRoute: 'Login', // Rute awal
+      routes: {
+        'Login': (context) => LoginPage(),
+        //'/home': (context) => HomePage(),
+        //'/profile': (context) => ProfilePage(),
+        // Tambahkan rute beri nama lain sesuai kebutuhan Anda
+      },
     );
   }
 }
