@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatelessWidget {
   final Map<String, dynamic> userData; // Data pengguna
+  final String token;
 
-  ProfilePage(this.userData);
+  ProfilePage(this.userData, this.token);
 
   @override
   Widget build(BuildContext context) {
@@ -76,14 +78,62 @@ class ProfilePage extends StatelessWidget {
                       value: '${userData['pegawaidetail'][0]['alamat']}',
                     ),
                     SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.login_rounded,
-                        color: Color(0x81FF000E),
-                        size: 40,
+                    GestureDetector(
+                      onTap: () async {
+                        bool confirmLogout = await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Konfirmasi Logout'),
+                              content: Text('Anda yakin ingin keluar?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text('Batal'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text('Ya, Keluar'),
+                                  onPressed: () async {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        if (confirmLogout == true) {
+                          try {
+                            final response = await http.post(
+                              Uri.parse(
+                                  'http://10.78.2.251/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
+                              headers: {
+                                'Authorization': 'Bearer $token',
+                              },
+                            );
+                            if (response.statusCode == 200) {
+                              // Logout berhasil, arahkan ke halaman login
+                              Navigator.pushNamed(context, 'Login');
+                            } else {
+                              // Logout gagal, cetak kode status
+                              print('Logout Gagal: ${response.statusCode}');
+                            }
+                          } catch (e) {
+                            // Tangani kesalahan jaringan
+                            print('Error: $e');
+                          }
+                        }
+                      },
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.login_rounded,
+                          color: Color(0x81FF000E),
+                          size: 40,
+                        ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),

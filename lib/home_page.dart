@@ -126,11 +126,12 @@ class _HomePageState extends State<HomePage> {
           final response = await http.get(url, headers: headers);
 
           if (response.statusCode == 200) {
+            final token = widget.token;
             final data = json.decode(response.body);
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfilePage(data),
+                builder: (context) => ProfilePage(data, token),
               ),
             );
           } else {
