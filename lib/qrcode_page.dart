@@ -21,9 +21,9 @@ class _QRCodePageState extends State<QRCodePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildAppBar(context),
-            buildQRCode(),
-            buildDeleteAccessButton(context),
+            _buildAppBar(context),
+            _buildQRCode(),
+            _buildDeleteAccessButton(context),
             SizedBox(height: 20),
           ],
         ),
@@ -31,7 +31,7 @@ class _QRCodePageState extends State<QRCodePage> {
     );
   }
 
-  Widget buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context) {
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 12, 24, 12),
       child: Row(
@@ -51,7 +51,7 @@ class _QRCodePageState extends State<QRCodePage> {
     );
   }
 
-  Widget buildQRCode() {
+  Widget _buildQRCode() {
     String qrcodeValue = widget.qrCodeData['qrcode'][0]['qrcode'];
     return Container(
       alignment: Alignment.center,
@@ -69,11 +69,11 @@ class _QRCodePageState extends State<QRCodePage> {
     );
   }
 
-  Widget buildDeleteAccessButton(BuildContext context) {
+  Widget _buildDeleteAccessButton(BuildContext context) {
     return Center(
       child: ElevatedButton(
         onPressed: () {
-          deleteAccess(context);
+          _deleteAccess(context);
         },
         style: ElevatedButton.styleFrom(
           primary: Color(0xFFFF000E), // Warna latar belakang
@@ -95,7 +95,7 @@ class _QRCodePageState extends State<QRCodePage> {
     );
   }
 
-  Future<void> deleteAccess(BuildContext context) async {
+  Future<void> _deleteAccess(BuildContext context) async {
     try {
       final id = widget.qrCodeData['qrcode'][0]['pegawai'];
       final response = await http.get(
@@ -109,26 +109,20 @@ class _QRCodePageState extends State<QRCodePage> {
 
       if (response.statusCode == 200) {
         if (status == 'success') {
-          showSnackBar(context, 'Berhasil Menghapus Akses: $message');
+          _showSnackBar('$message');
         } else {
-          showSnackBar(context, 'Gagal Menghapus Akses: $message');
+          _showSnackBar('$message');
         }
       } else {
-        showSnackBar(
-          context,
-          'Gagal Menghapus Akses',
-        );
+        _showSnackBar('Gagal Menghapus Akses');
       }
     } catch (e) {
       print('Error: $e');
-      showSnackBar(
-        context,
-        'Gagal Menghapus Akses',
-      );
+      _showSnackBar('Gagal Menghapus Akses');
     }
   }
 
-  void showSnackBar(BuildContext context, String message) {
+  void _showSnackBar(String message) {
     final snackBar = SnackBar(
       content: Text(message.isNotEmpty ? message : 'Tidak ada pesan'),
       action: SnackBarAction(
