@@ -76,7 +76,7 @@ class _QRCodePageState extends State<QRCodePage> {
           _deleteAccess(context);
         },
         style: ElevatedButton.styleFrom(
-          primary: Color(0xFFFF000E), // Warna latar belakang
+          backgroundColor: Color(0xFFFF000E), // Warna latar belakang
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

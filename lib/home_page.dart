@@ -378,7 +378,7 @@ class _HomePageState extends State<HomePage> {
                       });
                     }
                   },
-                  child: Text('Tambah Akses'),
+                  child: Text('Akses Loker'),
                 ),
         ),
         Padding(
