@@ -10,24 +10,25 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _nipController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _passwordVisibility = false;
 
   Future<void> _login(BuildContext context) async {
-    String nip = _nipController.text;
+    String username = _usernameController.text;
     String password = _passwordController.text;
 
-    if (nip.isEmpty || password.isEmpty) {
-      _showAlertDialog('Login Gagal', 'Silakan masukkan NIP dan kata sandi.');
+    if (username.isEmpty || password.isEmpty) {
+      _showAlertDialog(
+          'Login Gagal', 'Silakan masukkan Username dan kata sandi.');
       return;
     }
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.78.2.251/admin-elocker/public/api/v1/login'),
+        Uri.parse('http://10.78.3.165/admin-elocker/public/api/v1/login'),
         body: {
-          'nip': nip,
+          'username': username,
           'password': password,
         },
       );
@@ -46,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       } else {
-        _showAlertDialog('Login Gagal', 'NIP atau kata sandi salah.');
+        _showAlertDialog('Login Gagal', 'Username atau kata sandi salah.');
       }
     } catch (e) {
       print('Error: $e');
@@ -115,9 +116,9 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 15),
                     child: TextField(
-                      controller: _nipController,
+                      controller: _usernameController,
                       decoration: InputDecoration(
-                        labelText: 'NIP',
+                        labelText: 'Username',
                         hintStyle: TextStyle(fontSize: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),

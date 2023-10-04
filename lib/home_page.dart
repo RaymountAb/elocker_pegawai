@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://10.78.2.251/admin-elocker/public/api/pegawai/home/$userId',
+          'http://10.78.3.165/admin-elocker/public/api/pegawai/home/$userId',
         ),
         headers: {
           'Authorization': 'Bearer ${widget.token}',
@@ -116,7 +116,7 @@ class _HomePageState extends State<HomePage> {
         onTap: () async {
           final userId = widget.userId;
           final url = Uri.parse(
-              'http://10.78.2.251/admin-elocker/public/api/pegawai/profile/$userId');
+              'http://10.78.3.165/admin-elocker/public/api/pegawai/profile/$userId');
 
           final headers = {
             'Authorization':
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
               try {
                 final response = await http.post(
                   Uri.parse(
-                      'http://10.78.2.251/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
+                      'http://10.78.3.165/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
                   headers: {
                     'Authorization': 'Bearer ${widget.token}',
                   },
@@ -225,7 +225,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () async {
                 final userId = widget.userId;
                 final url = Uri.parse(
-                    'http://10.78.2.251/admin-elocker/public/api/pegawai/qrcode/$userId');
+                    'http://10.78.3.165/admin-elocker/public/api/pegawai/qrcode/$userId');
 
                 final headers = {
                   'Authorization':
@@ -275,7 +275,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () async {
                 final userId = widget.userId;
                 final url = Uri.parse(
-                    'http://10.78.2.251/admin-elocker/public/api/pegawai/qrcode/$userId');
+                    'http://10.78.3.165/admin-elocker/public/api/pegawai/qrcode/$userId');
 
                 final headers = {
                   'Authorization':
@@ -359,7 +359,7 @@ class _HomePageState extends State<HomePage> {
                       final userId = widget.userId;
                       final response = await http.get(
                         Uri.parse(
-                            'http://10.78.2.251/admin-elocker/public/api/addAkses/$userId'),
+                            'http://10.78.3.165/admin-elocker/public/api/addAkses/$userId'),
                       );
 
                       if (response.statusCode == 200) {
