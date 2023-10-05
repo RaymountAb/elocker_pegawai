@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'profile_page.dart';
 import 'qrcode_page.dart';
 
@@ -41,29 +42,84 @@ class _HomePageState extends State<HomePage> {
       BuildContext context, String title, Map<String, dynamic> jsonResponse) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(
-              jsonResponse['message']), // Menggunakan pesan dari JSON response
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+      builder: (context) {
+        if (jsonResponse['status'] == 'success') {
+          return AlertDialog(
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 400, // Atur lebar sesuai kebutuhan
+                  height: 400, // Atur tinggi sesuai kebutuhan
+                  child: QrImageView(
+                    data: jsonResponse['qrcode'], // String QR Code
+                    version:
+                        QrVersions.auto, // Versi QR Code (bisa disesuaikan)
+                    size: 400, // Ukuran gambar QR Code
+                  ),
+                ),
+                SizedBox(height: 5),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    final qrcode = jsonResponse['qrcode'];
+                    final response = await http.get(Uri.parse(
+                        'http://10.78.7.81/admin-elocker/public/api/checkAkses/$qrcode'));
+
+                    if (response.statusCode == 200) {
+                      final data = json.decode(response.body);
+                      String status = data['status'];
+                      String message = data['message'];
+                      if (status == 'success') {
+                        _showSnackBar('$message');
+                      } else {
+                        _showSnackBar('$message');
+                      }
+                    } else {
+                      _showSnackBar('Silahkan ulangi qrcode');
+                    }
+                  },
+                  child: Text('Tutup'),
+                ),
+              ],
             ),
-          ],
-        );
+          );
+        } else {
+          // Jika status failed, tampilkan pesan
+          return AlertDialog(
+            title: Text(title),
+            content: Text(jsonResponse['message']),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Tutup'),
+              ),
+            ],
+          );
+        }
       },
     );
+  }
+
+  void _showSnackBar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message.isNotEmpty ? message : 'Tidak ada pesan'),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: () {},
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Future<void> fetchData(int userId) async {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://10.78.3.165/admin-elocker/public/api/pegawai/home/$userId',
+          'http://10.78.7.81/admin-elocker/public/api/pegawai/home/$userId',
         ),
         headers: {
           'Authorization': 'Bearer ${widget.token}',
@@ -116,7 +172,7 @@ class _HomePageState extends State<HomePage> {
         onTap: () async {
           final userId = widget.userId;
           final url = Uri.parse(
-              'http://10.78.3.165/admin-elocker/public/api/pegawai/profile/$userId');
+              'http://10.78.7.81/admin-elocker/public/api/pegawai/profile/$userId');
 
           final headers = {
             'Authorization':
@@ -182,7 +238,7 @@ class _HomePageState extends State<HomePage> {
               try {
                 final response = await http.post(
                   Uri.parse(
-                      'http://10.78.3.165/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
+                      'http://10.78.7.81/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
                   headers: {
                     'Authorization': 'Bearer ${widget.token}',
                   },
@@ -225,7 +281,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () async {
                 final userId = widget.userId;
                 final url = Uri.parse(
-                    'http://10.78.3.165/admin-elocker/public/api/pegawai/qrcode/$userId');
+                    'http://10.78.7.81/admin-elocker/public/api/pegawai/qrcode/$userId');
 
                 final headers = {
                   'Authorization':
@@ -275,7 +331,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () async {
                 final userId = widget.userId;
                 final url = Uri.parse(
-                    'http://10.78.3.165/admin-elocker/public/api/pegawai/qrcode/$userId');
+                    'http://10.78.7.81/admin-elocker/public/api/pegawai/qrcode/$userId');
 
                 final headers = {
                   'Authorization':
@@ -359,22 +415,28 @@ class _HomePageState extends State<HomePage> {
                       final userId = widget.userId;
                       final response = await http.get(
                         Uri.parse(
-                            'http://10.78.3.165/admin-elocker/public/api/addAkses/$userId'),
+                            'http://10.78.7.81/admin-elocker/public/api/addAkses/$userId'),
                       );
 
                       if (response.statusCode == 200) {
                         final jsonResponse = json.decode(response.body);
                         _showResponseDialog(
-                            context, 'Berhasil Menambah Akses', jsonResponse);
+                          context,
+                          'Scan QR Code Untuk Akses',
+                          jsonResponse,
+                        );
                       } else {
                         final jsonResponse = json.decode(response.body);
                         _showResponseDialog(
-                            context, 'Gagal Menambah Akses', jsonResponse);
+                          context,
+                          'Gagal Menambah Akses',
+                          jsonResponse,
+                        );
                       }
                     } catch (e) {
                       print('Error: $e');
                       _showResponseDialog(context, 'Error', {
-                        'message': 'Terjadi kesalahan saat menambah akses.'
+                        'message': 'Terjadi kesalahan saat menambah akses.',
                       });
                     }
                   },
