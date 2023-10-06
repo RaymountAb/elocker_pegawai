@@ -107,7 +107,7 @@ class ProfilePage extends StatelessWidget {
                           try {
                             final response = await http.post(
                               Uri.parse(
-                                  'http://10.78.7.81/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
+                                  'http://10.78.7.61/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
                               headers: {
                                 'Authorization': 'Bearer $token',
                               },

@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.78.7.81/admin-elocker/public/api/v1/login'),
+        Uri.parse('http://10.78.7.61/admin-elocker/public/api/v1/login'),
         body: {
           'username': username,
           'password': password,

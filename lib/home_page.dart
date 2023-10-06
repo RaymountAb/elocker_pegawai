@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.of(context).pop();
                     final qrcode = jsonResponse['qrcode'];
                     final response = await http.get(Uri.parse(
-                        'http://10.78.7.81/admin-elocker/public/api/checkAkses/$qrcode'));
+                        'http://10.78.7.61/admin-elocker/public/api/checkAkses/$qrcode'));
 
                     if (response.statusCode == 200) {
                       final data = json.decode(response.body);
@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://10.78.7.81/admin-elocker/public/api/pegawai/home/$userId',
+          'http://10.78.7.61/admin-elocker/public/api/pegawai/home/$userId',
         ),
         headers: {
           'Authorization': 'Bearer ${widget.token}',
@@ -172,7 +172,7 @@ class _HomePageState extends State<HomePage> {
         onTap: () async {
           final userId = widget.userId;
           final url = Uri.parse(
-              'http://10.78.7.81/admin-elocker/public/api/pegawai/profile/$userId');
+              'http://10.78.7.61/admin-elocker/public/api/pegawai/profile/$userId');
 
           final headers = {
             'Authorization':
@@ -238,7 +238,7 @@ class _HomePageState extends State<HomePage> {
               try {
                 final response = await http.post(
                   Uri.parse(
-                      'http://10.78.7.81/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
+                      'http://10.78.7.61/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
                   headers: {
                     'Authorization': 'Bearer ${widget.token}',
                   },
@@ -279,28 +279,50 @@ class _HomePageState extends State<HomePage> {
           children: [
             GestureDetector(
               onTap: () async {
-                final userId = widget.userId;
-                final url = Uri.parse(
-                    'http://10.78.7.81/admin-elocker/public/api/pegawai/qrcode/$userId');
+                if (userData['locker'] != null) {
+                  final userId = widget.userId;
+                  final url = Uri.parse(
+                      'http://10.78.7.61/admin-elocker/public/api/pegawai/qrcode/$userId');
 
-                final headers = {
-                  'Authorization':
-                      'Bearer ${widget.token}', // Gantilah $yourToken dengan token yang valid
-                };
+                  final headers = {
+                    'Authorization':
+                        'Bearer ${widget.token}', // Gantilah $yourToken dengan token yang valid
+                  };
 
-                final response = await http.get(url, headers: headers);
+                  final response = await http.get(url, headers: headers);
 
-                if (response.statusCode == 200) {
-                  final data = json.decode(response.body);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QRCodePage(data),
-                    ),
-                  );
+                  if (response.statusCode == 200) {
+                    final data = json.decode(response.body);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QRCodePage(data),
+                      ),
+                    );
+                  } else {
+                    // Tangani kesalahan jika permintaan ke server gagal
+                    print(
+                        'Gagal mengambil data QR Code: ${response.statusCode}');
+                  }
                 } else {
-                  // Tangani kesalahan jika permintaan ke server gagal
-                  print('Gagal mengambil data QR Code: ${response.statusCode}');
+                  // Tampilkan dialog bahwa pengguna tidak memiliki akses loker
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Tidak Ada Akses Loker'),
+                        content: Text('Silahkan Akses loker terlebih dahulu.'),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Tutup'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 }
               },
               child: Container(
@@ -329,28 +351,50 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 12),
             GestureDetector(
               onTap: () async {
-                final userId = widget.userId;
-                final url = Uri.parse(
-                    'http://10.78.7.81/admin-elocker/public/api/pegawai/qrcode/$userId');
+                if (userData['locker'] != null) {
+                  final userId = widget.userId;
+                  final url = Uri.parse(
+                      'http://10.78.7.61/admin-elocker/public/api/pegawai/qrcode/$userId');
 
-                final headers = {
-                  'Authorization':
-                      'Bearer ${widget.token}', // Gantilah $yourToken dengan token yang valid
-                };
+                  final headers = {
+                    'Authorization':
+                        'Bearer ${widget.token}', // Gantilah $yourToken dengan token yang valid
+                  };
 
-                final response = await http.get(url, headers: headers);
+                  final response = await http.get(url, headers: headers);
 
-                if (response.statusCode == 200) {
-                  final data = json.decode(response.body);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QRCodePage(data),
-                    ),
-                  );
+                  if (response.statusCode == 200) {
+                    final data = json.decode(response.body);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QRCodePage(data),
+                      ),
+                    );
+                  } else {
+                    // Tangani kesalahan jika permintaan ke server gagal
+                    print(
+                        'Gagal mengambil data QR Code: ${response.statusCode}');
+                  }
                 } else {
-                  // Tangani kesalahan jika permintaan ke server gagal
-                  print('Gagal mengambil data QR Code: ${response.statusCode}');
+                  // Tampilkan dialog bahwa pengguna tidak memiliki akses loker
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Tidak Ada Akses Loker'),
+                        content: Text('Silahkan Akses loker terlebih dahulu'),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Tutup'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 }
               },
               child: Text(
@@ -415,7 +459,7 @@ class _HomePageState extends State<HomePage> {
                       final userId = widget.userId;
                       final response = await http.get(
                         Uri.parse(
-                            'http://10.78.7.81/admin-elocker/public/api/addAkses/$userId'),
+                            'http://10.78.7.61/admin-elocker/public/api/addAkses/$userId'),
                       );
 
                       if (response.statusCode == 200) {
