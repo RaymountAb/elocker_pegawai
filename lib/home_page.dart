@@ -18,7 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> userData = {};
-
+  bool shouldRefresh = false;
   @override
   void initState() {
     super.initState();
@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.of(context).pop();
                     final qrcode = jsonResponse['qrcode'];
                     final response = await http.get(Uri.parse(
-                        'http://10.78.7.61/admin-elocker/public/api/checkAkses/$qrcode'));
+                        'https://admin-elocker.adevelop.my.id/api/checkakses/$qrcode'));
 
                     if (response.statusCode == 200) {
                       final data = json.decode(response.body);
@@ -73,11 +73,21 @@ class _HomePageState extends State<HomePage> {
                       String message = data['message'];
                       if (status == 'success') {
                         _showSnackBar('$message');
+                        // Setelah aksi berhasil, atur shouldRefresh menjadi true
+                        setState(() {
+                          shouldRefresh = true;
+                        });
                       } else {
                         _showSnackBar('$message');
+                        setState(() {
+                          shouldRefresh = true;
+                        });
                       }
                     } else {
                       _showSnackBar('Silahkan ulangi qrcode');
+                      setState(() {
+                        shouldRefresh = true;
+                      });
                     }
                   },
                   child: Text('Tutup'),
@@ -119,7 +129,7 @@ class _HomePageState extends State<HomePage> {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://10.78.7.61/admin-elocker/public/api/pegawai/home/$userId',
+          'https://admin-elocker.adevelop.my.id/api/pegawai/home/$userId',
         ),
         headers: {
           'Authorization': 'Bearer ${widget.token}',
@@ -141,6 +151,14 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (shouldRefresh) {
+      // Jika shouldRefresh adalah true, panggil fetchData untuk merefresh data
+      fetchData(widget.userId);
+      // Set shouldRefresh kembali menjadi false agar tidak terus merefresh
+      setState(() {
+        shouldRefresh = false;
+      });
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -172,7 +190,7 @@ class _HomePageState extends State<HomePage> {
         onTap: () async {
           final userId = widget.userId;
           final url = Uri.parse(
-              'http://10.78.7.61/admin-elocker/public/api/pegawai/profile/$userId');
+              'https://admin-elocker.adevelop.my.id/api/pegawai/profile/$userId');
 
           final headers = {
             'Authorization':
@@ -238,7 +256,7 @@ class _HomePageState extends State<HomePage> {
               try {
                 final response = await http.post(
                   Uri.parse(
-                      'http://10.78.7.61/admin-elocker/public/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
+                      'https://admin-elocker.adevelop.my.id/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
                   headers: {
                     'Authorization': 'Bearer ${widget.token}',
                   },
@@ -282,7 +300,7 @@ class _HomePageState extends State<HomePage> {
                 if (userData['locker'] != null) {
                   final userId = widget.userId;
                   final url = Uri.parse(
-                      'http://10.78.7.61/admin-elocker/public/api/pegawai/qrcode/$userId');
+                      'https://admin-elocker.adevelop.my.id/api/pegawai/qrcode/$userId');
 
                   final headers = {
                     'Authorization':
@@ -354,7 +372,7 @@ class _HomePageState extends State<HomePage> {
                 if (userData['locker'] != null) {
                   final userId = widget.userId;
                   final url = Uri.parse(
-                      'http://10.78.7.61/admin-elocker/public/api/pegawai/qrcode/$userId');
+                      'https://admin-elocker.adevelop.my.id/api/pegawai/qrcode/$userId');
 
                   final headers = {
                     'Authorization':
@@ -459,14 +477,14 @@ class _HomePageState extends State<HomePage> {
                       final userId = widget.userId;
                       final response = await http.get(
                         Uri.parse(
-                            'http://10.78.7.61/admin-elocker/public/api/addAkses/$userId'),
+                            'https://admin-elocker.adevelop.my.id/api/addAkses/$userId'),
                       );
 
                       if (response.statusCode == 200) {
                         final jsonResponse = json.decode(response.body);
                         _showResponseDialog(
                           context,
-                          'Scan QR Code Untuk Akses',
+                          'Scan QR Code untuk Gunakan',
                           jsonResponse,
                         );
                       } else {

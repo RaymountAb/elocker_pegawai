@@ -99,7 +99,7 @@ class _QRCodePageState extends State<QRCodePage> {
     try {
       final id = widget.qrCodeData['qrcode'][0]['pegawai'];
       final response = await http.get(
-        Uri.parse('http://10.78.7.61/admin-elocker/public/api/end-session/$id'),
+        Uri.parse('https://admin-elocker.adevelop.my.id/api/end-session/$id'),
       );
 
       final jsonResponse = json.decode(response.body);
