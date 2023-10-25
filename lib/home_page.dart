@@ -5,18 +5,18 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'profile_page.dart';
 import 'qrcode_page.dart';
 
-class HomePage extends StatefulWidget {
+class HomePageWidget extends StatefulWidget {
   final String token;
   final String userName;
   final int userId;
 
-  HomePage(this.token, this.userName, this.userId);
+  HomePageWidget(this.token, this.userName, this.userId);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageWidgetState createState() => _HomePageWidgetState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageWidgetState extends State<HomePageWidget> {
   Map<String, dynamic> userData = {};
   bool shouldRefresh = false;
   @override
@@ -184,7 +184,9 @@ class _HomePageState extends State<HomePage> {
   // Widget untuk AppBar
   Widget buildAppBar() {
     return AppBar(
-      backgroundColor: Colors.blue,
+      backgroundColor:
+          Colors.transparent, // Atur background color menjadi transparent
+      elevation: 0, // Hilangkan shadow AppBar
       automaticallyImplyLeading: false,
       title: GestureDetector(
         onTap: () async {
@@ -218,6 +220,7 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: Colors.black, // Ubah warna teks menjadi hitam
           ),
         ),
       ),
@@ -229,55 +232,11 @@ class _HomePageState extends State<HomePage> {
             size: 30,
           ),
           onPressed: () async {
-            bool confirmLogout = await showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Konfirmasi Logout'),
-                  content: Text('Anda yakin ingin keluar?'),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text('Batal'),
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      },
-                    ),
-                    TextButton(
-                      child: Text('Ya, Keluar'),
-                      onPressed: () async {
-                        Navigator.of(context).pop(true);
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-            if (confirmLogout == true) {
-              try {
-                final response = await http.post(
-                  Uri.parse(
-                      'https://admin-elocker.adevelop.my.id/api/logout'), // Ganti URL_LOGOUT_API dengan URL yang sesuai
-                  headers: {
-                    'Authorization': 'Bearer ${widget.token}',
-                  },
-                );
-                if (response.statusCode == 200) {
-                  // Logout berhasil, arahkan ke halaman login
-                  Navigator.pushNamed(context, 'Login');
-                } else {
-                  // Logout gagal, cetak kode status
-                  print('Logout Gagal: ${response.statusCode}');
-                }
-              } catch (e) {
-                // Tangani kesalahan jaringan
-                print('Error: $e');
-              }
-            }
+            // ...
           },
         )
       ],
       centerTitle: false,
-      elevation: 0,
     );
   }
 
