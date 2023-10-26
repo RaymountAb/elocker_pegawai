@@ -1,3 +1,4 @@
+import 'package:elocker_pegawai/Historypage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
@@ -492,41 +493,126 @@ class _HomePageState extends State<HomePage> {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildCardIcon(Icons.history, 'History'),
-        _buildCardIcon(Icons.qr_code, 'Scan QR Code'),
-        _buildCardIcon(Icons.work_off_outlined, 'Akhiri Akses'),
+        _buildCardWithAction(Icons.history, 'History', () async {
+          try {
+            final userId = widget.userId;
+            final url = Uri.parse(
+                'https://admin-elocker.adevelop.my.id/api/pegawai/history/$userId');
+
+            final headers = {
+              'Authorization': 'Bearer ${widget.token}',
+            };
+
+            final response = await http.get(url, headers: headers);
+
+            if (response.statusCode == 200) {
+              final data = json.decode(response.body);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HistoryPage(data),
+                ),
+              );
+            } else {
+              print('Gagal mengambil data History: ${response.statusCode}');
+            }
+          } catch (e) {
+            print('Error: $e');
+          }
+        }),
+        _buildCardWithAction(Icons.qr_code, 'Scan QR Code', () async {
+          try {
+            final userId = widget.userId;
+            final response = await http.get(
+              Uri.parse(
+                  'https://admin-elocker.adevelop.my.id/api/addAkses/$userId'),
+            );
+
+            if (response.statusCode == 200) {
+              final jsonResponse = json.decode(response.body);
+              _showResponseDialog(
+                context,
+                'Scan QR Code untuk Gunakan',
+                jsonResponse,
+              );
+            } else {
+              final jsonResponse = json.decode(response.body);
+              _showResponseDialog(
+                context,
+                'Gagal Menambah Akses',
+                jsonResponse,
+              );
+            }
+          } catch (e) {
+            print('Error: $e');
+            _showResponseDialog(context, 'Error', {
+              'message': 'Terjadi kesalahan saat menambah akses.',
+            });
+          }
+        }),
+        if (userData['locker'] != null)
+          _buildCardWithAction(Icons.work_off_outlined, 'Akhiri Akses',
+              () async {
+            try {
+              final id = widget.userId;
+              final response = await http.get(
+                Uri.parse(
+                    'https://admin-elocker.adevelop.my.id/api/end-session/$id'),
+              );
+
+              final jsonResponse = json.decode(response.body);
+              String status = jsonResponse['status'];
+              String message = jsonResponse['message'];
+
+              if (response.statusCode == 200) {
+                if (status == 'success') {
+                  _showSnackBar('$message');
+                } else {
+                  _showSnackBar('$message');
+                }
+              } else {
+                _showSnackBar('Gagal Menghapus Akses');
+              }
+            } catch (e) {
+              print('Error: $e');
+              _showSnackBar('Gagal Menghapus Akses');
+            }
+          }),
       ],
     );
   }
 
-  Widget _buildCardIcon(IconData icon, String label) {
+  Widget _buildCardWithAction(IconData icon, String label, VoidCallback onTap) {
     return Padding(
       padding: EdgeInsets.all(10),
-      child: SizedBox(
-        height: 100,
-        width: 100,
-        child: Card(
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          elevation: 10,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(5),
-                child: Icon(
-                  icon,
-                  color: primaryColor,
-                  size: 50,
+      child: GestureDetector(
+        onTap: onTap,
+        child: SizedBox(
+          height: 100,
+          width: 100,
+          child: Card(
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            elevation: 10,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Icon(
+                    icon,
+                    color: primaryColor,
+                    size: 50,
+                  ),
                 ),
-              ),
-              Text(
-                label,
-                style: buttonTextStyle,
-              ),
-            ],
+                Text(
+                  label,
+                  style: buttonTextStyle,
+                ),
+              ],
+            ),
           ),
         ),
       ),
