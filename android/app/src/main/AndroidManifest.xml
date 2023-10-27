@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Izin INTERNET -->
     <application
-        android:label="elocker_pegawai"
+        android:label="E-locker Pegawai"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
