@@ -129,7 +129,7 @@ class ProfilePage extends StatelessWidget {
                         alignment: Alignment.center,
                         child: Icon(
                           Icons.login_rounded,
-                          color: Color(0x81FF000E),
+                          color: Color(0xFFFF0000),
                           size: 40,
                         ),
                       ),

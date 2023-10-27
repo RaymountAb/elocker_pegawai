@@ -11,12 +11,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: 'Login', // Rute awal
+      initialRoute: 'Login',
       routes: {
         'Login': (context) => LoginPage(),
-        //'/home': (context) => HomePage(),
-        //'/profile': (context) => ProfilePage(),
-        // Tambahkan rute beri nama lain sesuai kebutuhan Anda
       },
     );
   }

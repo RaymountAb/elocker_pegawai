@@ -20,7 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> userData = {};
   bool shouldRefresh = false;
-  Color primaryColor = Color(0xFF105DFB);
+  Color primaryColor = Colors.blue;
   Color bgColor = Color(0xFF73CEFF);
 
   TextStyle titleTextStyle = TextStyle(
@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
 
   Icon personIcon = Icon(
     Icons.person,
-    color: Color(0xFF105DFB),
+    color: Colors.blue,
     size: 24,
   );
 
@@ -66,8 +66,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _refreshPage() async {
     await fetchData(widget.userId);
-    setState(() {});
-    _showSnackBar('Halaman Diperbarui');
+    setState(() {
+      shouldRefresh = true;
+    });
   }
 
   void _showResponseDialog(
@@ -75,86 +76,35 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (context) {
-        if (jsonResponse['status'] == 'success') {
-          return AlertDialog(
-            title: Text(title),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 400, // Atur lebar sesuai kebutuhan
-                  height: 400, // Atur tinggi sesuai kebutuhan
-                  child: QrImageView(
-                    data: jsonResponse['qrcode'], // String QR Code
-                    version:
-                        QrVersions.auto, // Versi QR Code (bisa disesuaikan)
-                    size: 400, // Ukuran gambar QR Code
-                  ),
+        return AlertDialog(
+          title: Text(title),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 400,
+                height: 400,
+                child: QrImageView(
+                  data: jsonResponse['qrcode'],
+                  version: QrVersions.auto,
+                  size: 400,
                 ),
-                SizedBox(height: 5),
-                ElevatedButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    final qrcode = jsonResponse['qrcode'];
-                    final response = await http.get(Uri.parse(
-                        'https://admin-elocker.adevelop.my.id/api/checkakses/$qrcode'));
-
-                    if (response.statusCode == 200) {
-                      final data = json.decode(response.body);
-                      String status = data['status'];
-                      String message = data['message'];
-                      if (status == 'success') {
-                        _showSnackBar('$message');
-                        // Setelah aksi berhasil, atur shouldRefresh menjadi true
-                        setState(() {
-                          shouldRefresh = true;
-                        });
-                      } else {
-                        _showSnackBar('$message');
-                        setState(() {
-                          shouldRefresh = true;
-                        });
-                      }
-                    } else {
-                      _showSnackBar('Silahkan ulangi qrcode');
-                      setState(() {
-                        shouldRefresh = true;
-                      });
-                    }
-                  },
-                  child: Text('Tutup'),
-                ),
-              ],
-            ),
-          );
-        } else {
-          // Jika status failed, tampilkan pesan
-          return AlertDialog(
-            title: Text(title),
-            content: Text(jsonResponse['message']),
-            actions: [
+              ),
+              SizedBox(height: 5),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
+                  setState(() {
+                    shouldRefresh = true;
+                  });
                 },
                 child: Text('Tutup'),
               ),
             ],
-          );
-        }
+          ),
+        );
       },
     );
-  }
-
-  void _showSnackBar(String message) {
-    final snackBar = SnackBar(
-      content: Text(message.isNotEmpty ? message : 'Tidak ada pesan'),
-      action: SnackBarAction(
-        label: 'OK',
-        onPressed: () {},
-      ),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Future<void> fetchData(int userId) async {
@@ -191,11 +141,14 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
-
+    if (shouldRefresh) {
+      fetchData(widget.userId);
+      setState(() {
+        shouldRefresh = false;
+      });
+    }
     return GestureDetector(
-      onTap: () {
-        // Handle onTap
-      },
+      onTap: () {},
       child: Scaffold(
         backgroundColor: Color(0xFFF8F8F8),
         body: SafeArea(
@@ -235,16 +188,14 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Padding(
-                                padding: EdgeInsets.only(
-                                    top: 10), // Menambahkan jarak atas
+                                padding: EdgeInsets.only(top: 10),
                                 child: Text(
                                   'Status Loker',
                                   style: titleTextStyle,
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(
-                                    top: 10), // Menambahkan jarak atas
+                                padding: EdgeInsets.only(top: 10),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: (userData['locker'] != null)
@@ -254,8 +205,9 @@ class _HomePageState extends State<HomePage> {
                               ),
                               Padding(
                                 padding: EdgeInsets.symmetric(
-                                    vertical:
-                                        10), // Menambahkan jarak atas dan bawah
+                                    vertical: 10,
+                                    horizontal:
+                                        20), // Sesuaikan jarak sesuai kebutuhan
                                 child: Text(
                                   (userData['locker'] != null)
                                       ? '${userData['locker']['name_loker']}'
@@ -267,9 +219,9 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                               ),
-                              if (userData['history'] != null)
+                              if (userData['histories'] != null)
                                 _buildHistoryRow(),
-                              if (userData['history'] == null)
+                              if (userData['histories'] == null)
                                 _buildEmptyHistoryRow(),
                             ],
                           ),
@@ -287,7 +239,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Metode-metode baru
   Widget _buildHeader() {
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -322,7 +273,7 @@ class _HomePageState extends State<HomePage> {
                         '${userData['userName'] ?? widget.userName}',
                         style: subTitleTextStyle.copyWith(
                           color: Colors.grey[700],
-                          fontSize: 17,
+                          fontSize: 15,
                         ),
                       ),
                     ],
@@ -352,13 +303,10 @@ class _HomePageState extends State<HomePage> {
 
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
-
-          // Pindah ke halaman profil dengan data yang diperlukan
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ProfilePage(data,
-                  widget.token), // Anda dapat menggunakan widget.token langsung
+              builder: (context) => ProfilePage(data, widget.token),
             ),
           );
         } else {
@@ -438,32 +386,31 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHistoryRow() {
-    if (userData['locker'] != null && userData['history'] != null) {
+    if (userData['locker'] != null && userData['histories'] != null) {
       return Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
             padding: EdgeInsets.all(10),
-            child: Text('${userData['history']['date']}'),
+            child: Text('${userData['histories'][0]['date']}'),
           ),
           Padding(
             padding: EdgeInsets.all(10),
             child: Text(
-              '${userData['history']['time']}',
+              'Jam : ${userData['histories'][0]['time']}',
               textAlign: TextAlign.center,
             ),
           ),
         ],
       );
     } else {
-      return SizedBox
-          .shrink(); // Widget akan tetap ada, tapi tidak terlihat jika data tidak tersedia
+      return SizedBox.shrink();
     }
   }
 
   Widget _buildEmptyHistoryRow() {
-    if (userData['locker'] == null || userData['history'] == null) {
+    if (userData['locker'] == null || userData['histories'] == null) {
       return Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -483,8 +430,7 @@ class _HomePageState extends State<HomePage> {
         ],
       );
     } else {
-      return SizedBox
-          .shrink(); // Widget akan tetap ada, tapi tidak terlihat jika data tersedia
+      return SizedBox.shrink();
     }
   }
 
@@ -532,7 +478,7 @@ class _HomePageState extends State<HomePage> {
               final jsonResponse = json.decode(response.body);
               _showResponseDialog(
                 context,
-                'Scan QR Code untuk Gunakan',
+                'Scan QR Code Akses',
                 jsonResponse,
               );
             } else {
@@ -553,32 +499,101 @@ class _HomePageState extends State<HomePage> {
         if (userData['locker'] != null)
           _buildCardWithAction(Icons.work_off_outlined, 'Akhiri Akses',
               () async {
-            try {
-              final id = widget.userId;
-              final response = await http.get(
-                Uri.parse(
-                    'https://admin-elocker.adevelop.my.id/api/end-session/$id'),
-              );
+            bool confirmEndAccess = await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Konfirmasi Akhiri Akses'),
+                  content: Text('Anda yakin ingin mengakhiri akses?'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('Batal'),
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                    ),
+                    TextButton(
+                      child: Text('Ya, Akhiri Akses'),
+                      onPressed: () async {
+                        Navigator.of(context).pop(true);
+                        try {
+                          final id = widget.userId;
+                          final response = await http.get(
+                            Uri.parse(
+                                'https://admin-elocker.adevelop.my.id/api/end-session/$id'),
+                          );
 
-              final jsonResponse = json.decode(response.body);
-              String status = jsonResponse['status'];
-              String message = jsonResponse['message'];
+                          final jsonResponse = json.decode(response.body);
+                          String status = jsonResponse['status'];
+                          String message = jsonResponse['message'];
 
-              if (response.statusCode == 200) {
-                if (status == 'success') {
-                  _showSnackBar('$message');
-                } else {
-                  _showSnackBar('$message');
-                }
-              } else {
-                _showSnackBar('Gagal Menghapus Akses');
-              }
-            } catch (e) {
-              print('Error: $e');
-              _showSnackBar('Gagal Menghapus Akses');
+                          if (response.statusCode == 200) {
+                            if (status == 'success') {
+                              _showSuccessDialog(message);
+                            } else {
+                              _showErrorDialog(message);
+                            }
+                          } else {
+                            _showErrorDialog('Gagal Menghapus Akses');
+                          }
+                        } catch (e) {
+                          print('Error: $e');
+                          _showErrorDialog('Gagal Menghapus Akses');
+                        }
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+            if (confirmEndAccess == true) {
+              // Perform your action here when the user confirms the end of access
             }
           }),
       ],
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Berhasil Mengakhiri Akses'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Tutup'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  shouldRefresh = true;
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Tutup'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -588,8 +603,8 @@ class _HomePageState extends State<HomePage> {
       child: GestureDetector(
         onTap: onTap,
         child: SizedBox(
-          height: 100,
-          width: 100,
+          height: 105,
+          width: 105,
           child: Card(
             clipBehavior: Clip.antiAliasWithSaveLayer,
             elevation: 10,
